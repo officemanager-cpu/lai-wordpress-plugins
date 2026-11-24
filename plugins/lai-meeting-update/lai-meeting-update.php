@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LAI Meeting Update Form
  * Description: A step-by-step form for groups to update their meeting details and officers (Secretary, Treasurer, IGR, GSR), or add a new meeting. Groups find their meeting by typing its name; the list comes from 12 Step Meeting List (read-only, never changed). Submissions are kept private under "Meeting Updates" in the dashboard and emailed to the office. Use the [lai_meeting_update] shortcode.
- * Version: 1.4.3
+ * Version: 1.4.4
  * Author: Lancaster Area Intergroup
  * License: GPL-2.0-or-later
  * Text Domain: lai-meeting-update
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LAI_MU_VERSION', '1.4.3' );
+define( 'LAI_MU_VERSION', '1.4.4' );
 define( 'LAI_MU_CPT', 'lai_mtg_update' );
 
 /** Where notices go: Meeting Updates > Settings, else the site's admin email. */
@@ -683,7 +683,35 @@ add_action(
 		add_meta_box( 'lai_mu_view', 'What was sent', 'lai_mu_render_box', LAI_MU_CPT, 'normal', 'high' );
 		add_meta_box( 'lai_mu_state', 'Status', 'lai_mu_status_box', LAI_MU_CPT, 'side', 'high' );
 		remove_meta_box( 'postcustom', LAI_MU_CPT, 'normal' );
+		// Submissions can never be published, so WordPress's Publish box only confuses. The Status box has the Save button.
+		remove_meta_box( 'submitdiv', LAI_MU_CPT, 'side' );
 	}
+);
+
+/* In the list, don't label every row "— Private": they all are, by design. */
+add_filter(
+	'display_post_states',
+	function ( $states, $post ) {
+		if ( LAI_MU_CPT === $post->post_type ) {
+			unset( $states['private'] );
+		}
+		return $states;
+	},
+	10,
+	2
+);
+
+/* No Quick Edit: its status menu offers "Published", which can never apply here. */
+add_filter(
+	'post_row_actions',
+	function ( $actions, $post ) {
+		if ( LAI_MU_CPT === $post->post_type ) {
+			unset( $actions['inline hide-if-no-js'] );
+		}
+		return $actions;
+	},
+	10,
+	2
 );
 
 function lai_mu_row( $label, $value ) {
@@ -758,6 +786,17 @@ function lai_mu_status_box( $post ) {
 		echo '<option value="' . esc_attr( $k ) . '"' . selected( $s, $k, false ) . '>' . esc_html( $n ) . '</option>';
 	}
 	echo '</select><p class="description">Mark Done once the change is entered.</p>';
+	// Replaces the Publish box. The item always stays private (see lai_mu_private_types()).
+	echo '<input type="hidden" name="post_status" value="private">';
+	echo '<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:12px">';
+	if ( current_user_can( 'delete_post', $post->ID ) ) {
+		echo '<a class="submitdelete" style="color:#b32d2e" href="' . esc_url( get_delete_post_link( $post->ID ) ) . '">Move to Trash</a>';
+	} else {
+		echo '<span></span>';
+	}
+	echo '<input type="submit" name="save" id="save-post" class="button button-primary button-large" value="Save">';
+	echo '</div>';
+	echo '<p class="description" style="margin-top:10px">This record stays private: it is only seen here in the dashboard, never on the website.</p>';
 }
 
 add_action(
