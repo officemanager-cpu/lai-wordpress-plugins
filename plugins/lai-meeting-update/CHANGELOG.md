@@ -4,6 +4,12 @@ All notable changes to this plugin. Versions follow [semantic versioning](https:
 
 > **Note:** This history was reconstructed from the 1.4.0 code when the plugin was first put in git (2026-11-24). Version 1.4.0 is exact. The contents of 1.0.0–1.3.0 are a best reading of the code, and their dates aren't known. Please correct any entry that's wrong.
 
+## [1.4.4] – 2026-11-24
+
+### Changed
+- On a **Meeting Updates** item, WordPress's Publish box is gone, because a submission can never be published (pressing Publish only set it back to Private, which was confusing). The **Status** box now has the **Save** button and a **Move to Trash** link, and says the record is only ever seen in the dashboard.
+- The Meeting Updates list no longer labels every row "— Private", and has no **Quick Edit** link (its status menu offered "Published").
+
 ## [1.4.3] – 2026-11-24
 
 ### Added

@@ -1,6 +1,6 @@
 # LAI Meeting Update Form
 
-**Version 1.4.3** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
+**Version 1.4.4** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
 
 This plugin gives A.A. groups in the Lancaster Area Intergroup an easy online way to tell the office about a new meeting, or about changes to an existing meeting and its officers. It also gives the office a tool for printing a filled-in paper **Group Information Change Form** for any meeting.
 
@@ -27,7 +27,7 @@ Each submission:
 
 - is saved as a **private** post in the custom post type `lai_mtg_update`, which shows in the dashboard as **Meeting Updates**. Its title is like *"Update: Miracles Happen (Tuesday 7:00 pm)"* or *"New meeting: …"*.
   - Meta `lai_mu_data` holds the full submission as JSON, including a snapshot of the meeting's public listing at the time it was sent.
-  - Meta `lai_mu_status` is `new`, `done`, or `spam`. It is set from a **Status** box on the edit screen.
+  - Meta `lai_mu_status` is `new`, `done`, or `spam`. It is set from the **Status** box on the edit screen, which also holds the **Save** button. There is no Publish box, because a submission can never be published.
   - The **Meeting Updates** dashboard menu shows a count bubble with the number of submissions still marked New, like the one on Comments.
   - These posts can't be created by hand and can never be published. Any attempt to publish is forced back to private. (Since 1.4.1 the same applies to the officer-initials and officer-details items.)
 - is **emailed to the office** at the address set under **Meeting Updates › Settings** (option `lai_mu_office_email`). If that is blank, the site's admin email is used. The email lists only *which* fields are changing and the officers' **first name + last initial**. Phone numbers, emails, and addresses are only in the dashboard, and the email links to the dashboard entry.
