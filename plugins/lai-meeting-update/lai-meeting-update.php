@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LAI Meeting Update Form
  * Description: A step-by-step form for groups to update their meeting details and officers (Secretary, Treasurer, IGR, GSR), or add a new meeting. Groups find their meeting by typing its name; the list comes from 12 Step Meeting List (read-only, never changed). Submissions are kept private under "Meeting Updates" in the dashboard and emailed to the office. Use the [lai_meeting_update] shortcode.
- * Version: 1.4.0
+ * Version: 1.4.1
  * Author: Lancaster Area Intergroup
  * License: GPL-2.0-or-later
  * Text Domain: lai-meeting-update
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LAI_MU_VERSION', '1.4.0' );
+define( 'LAI_MU_VERSION', '1.4.1' );
 define( 'LAI_MU_CPT', 'lai_mtg_update' );
 
 /** Where notices go: Meeting Updates > Settings, else the site's admin email. */
@@ -185,16 +185,40 @@ add_filter(
 	2
 );
 
-/* Never allow these to be published. */
+/** The post types that hold officer or submission details. None of them may ever be public. */
+function lai_mu_private_types() {
+	return array( LAI_MU_CPT, 'lai_mu_roster', 'lai_mu_officers' );
+}
+
+/* Never allow these to be published (or scheduled to publish). Applies to REST and connector updates too. */
 add_filter(
 	'wp_insert_post_data',
 	function ( $data ) {
-		if ( LAI_MU_CPT === $data['post_type'] && 'publish' === $data['post_status'] ) {
+		if ( in_array( $data['post_type'], lai_mu_private_types(), true ) && in_array( $data['post_status'], array( 'publish', 'future' ), true ) ) {
 			$data['post_status'] = 'private';
 		}
 		return $data;
 	}
 );
+
+/*
+ * Second lock: a meta field's auth_callback only controls who can CHANGE it, not who can READ it.
+ * So the REST API never shows these items' meta to anyone who can't edit posts, whatever their status.
+ */
+foreach ( lai_mu_private_types() as $lai_mu_type ) {
+	add_filter(
+		'rest_prepare_' . $lai_mu_type,
+		function ( $response ) {
+			if ( ! current_user_can( 'edit_posts' ) && $response instanceof WP_REST_Response ) {
+				$data = $response->get_data();
+				unset( $data['meta'] );
+				$response->set_data( $data );
+			}
+			return $response;
+		}
+	);
+}
+unset( $lai_mu_type );
 
 /* Settings: where the office notice goes. */
 add_action(
@@ -713,7 +737,7 @@ add_action(
  * Shows the paper form filled in for one meeting, ready to print.
  * Only works on a PASSWORD-PROTECTED page (after the password is entered)
  * or for signed-in editors. Officer details come from a private item
- * ("lai_mu_officers"), refreshed nightly from the office's U/D groups sheet.
+ * ("lai_mu_officers"), refreshed hourly from the office's U/D groups sheet.
  * ================================================================== */
 add_action(
 	'init',

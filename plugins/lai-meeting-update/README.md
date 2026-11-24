@@ -1,6 +1,6 @@
 # LAI Meeting Update Form
 
-**Version 1.4.0** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
+**Version 1.4.1** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
 
 This plugin gives A.A. groups in the Lancaster Area Intergroup an easy online way to tell the office about a new meeting, or about changes to an existing meeting and its officers. It also gives the office a tool for printing a filled-in paper **Group Information Change Form** for any meeting.
 
@@ -28,7 +28,7 @@ Each submission:
 - is saved as a **private** post in the custom post type `lai_mtg_update`, which shows in the dashboard as **Meeting Updates**. Its title is like *"Update: Miracles Happen (Tuesday 7:00 pm)"* or *"New meeting: …"*.
   - Meta `lai_mu_data` holds the full submission as JSON, including a snapshot of the meeting's public listing at the time it was sent.
   - Meta `lai_mu_status` is `new`, `done`, or `spam`. It is set from a **Status** box on the edit screen.
-  - These posts can't be created by hand and can never be published. Any attempt to publish is forced back to private.
+  - These posts can't be created by hand and can never be published. Any attempt to publish is forced back to private. (Since 1.4.1 the same applies to the officer-initials and officer-details items.)
 - is **emailed to the office** at the address set under **Meeting Updates › Settings** (option `lai_mu_office_email`). If that is blank, the site's admin email is used. The email lists only *which* fields are changing and the officers' **first name + last initial**. Phone numbers, emails, and addresses are only in the dashboard, and the email links to the dashboard entry.
 
 ### 3. Spam protection
@@ -91,7 +91,7 @@ Officer contact details are **never public**. The design keeps them in three lay
 2. **Where full details are stored.** Full details from submissions are stored only in private `lai_mtg_update` posts. Full details for the office tool are stored only in the private `lai_mu_officers` item. Both custom post types are non-public, not publicly queryable, excluded from search, and have no rewrite rules. Their meta can only be **written** by users with `edit_posts`.
 3. **Where full details are shown.** Full details appear only in the dashboard and on the password-protected, noindex, no-cache Group Change Form page.
 
-> **Important: what actually keeps the REST data private is the post status.** In WordPress, a meta field's `auth_callback` only controls who can *change* it. Whether someone can *read* a post (and its meta) over `/wp-json/wp/v2/...` depends on the post's status. Submissions are forced to Private by the plugin. The `lai_mu_roster` and `lai_mu_officers` items rely on the scheduled task saving them as **Private**. If one of them were ever saved as Published, its JSON would be readable by anyone. As of 2026-11-24 all three public endpoints return an empty list to anonymous visitors, as they should.
+> **Two locks on the REST API (since 1.4.1).** In WordPress, a meta field's `auth_callback` only controls who can *change* it; who can *read* a post and its meta over `/wp-json/wp/v2/...` depends on the post's status. So the plugin (1) forces all three post types (`lai_mtg_update`, `lai_mu_roster`, `lai_mu_officers`) to stay Private, even if something tries to publish one, and (2) removes their meta from REST responses for anyone who can't edit posts. As of 2026-11-24 all three public endpoints return an empty list to anonymous visitors.
 
 The office's own public contact details (phone 740-653-4869, the office mailing address, and the office email printed on the paper form) are hardcoded in the plugin. These are not personal details.
 

@@ -122,7 +122,7 @@
 	printBtn.addEventListener('click', function () { window.print(); });
 
 	if (!rows.length) {
-		status.textContent = 'No officer details have been loaded yet. They are copied from the U/D groups sheet each evening.';
+		status.textContent = 'No officer details have been loaded yet. They are copied from the U/D groups sheet every hour, 8 AM to 10 PM.';
 		q.disabled = true;
 		return;
 	}

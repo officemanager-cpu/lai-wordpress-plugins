@@ -4,6 +4,15 @@ All notable changes to this plugin. Versions follow [semantic versioning](https:
 
 > **Note:** This history was reconstructed from the 1.4.0 code when the plugin was first put in git (2026-11-24). Version 1.4.0 is exact. The contents of 1.0.0–1.3.0 are a best reading of the code, and their dates aren't known. Please correct any entry that's wrong.
 
+## [1.4.1] – 2026-11-24
+
+### Security / privacy
+- The officer-initials (`lai_mu_roster`) and officer-details (`lai_mu_officers`) items can no longer be published. Like submissions, any attempt to publish or schedule one is forced back to Private. Before this, their privacy depended on the scheduled task saving them as Private.
+- Second lock on the REST API: the meta of submissions, officer initials, and officer details is removed from REST responses for anyone without `edit_posts`, whatever the item's status. (A meta field's `auth_callback` only controls who can change it, not who can read it.)
+
+### Changed
+- The Group Change Form's "no officer details loaded yet" message now says the details are copied every hour, 8 AM to 10 PM, instead of "each evening", to match the scheduled task's new schedule.
+
 ## [1.4.0]
 
 ### Added
