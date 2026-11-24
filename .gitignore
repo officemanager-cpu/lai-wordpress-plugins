@@ -15,6 +15,8 @@ wp-config*.php
 *.log
 node_modules/
 vendor/
+# ...except third-party libraries a plugin ships with (MapLibre for the meeting finder)
+!plugins/*/assets/vendor/
 
 # Editors and OS
 .vscode/
