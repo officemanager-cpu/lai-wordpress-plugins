@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LAI Meeting Update Form
  * Description: A step-by-step form for groups to update their meeting details and officers (Secretary, Treasurer, IGR, GSR), or add a new meeting. Groups find their meeting by typing its name; the list comes from 12 Step Meeting List (read-only, never changed). Submissions are kept private under "Meeting Updates" in the dashboard and emailed to the office. Use the [lai_meeting_update] shortcode.
- * Version: 1.4.1
+ * Version: 1.4.2
  * Author: Lancaster Area Intergroup
  * License: GPL-2.0-or-later
  * Text Domain: lai-meeting-update
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LAI_MU_VERSION', '1.4.1' );
+define( 'LAI_MU_VERSION', '1.4.2' );
 define( 'LAI_MU_CPT', 'lai_mtg_update' );
 
 /** Where notices go: Meeting Updates > Settings, else the site's admin email. */
@@ -817,14 +817,30 @@ function lai_mu_officer_rows() {
 	return $out;
 }
 
+/** True on a page that uses the Group Change Form shortcode. */
+function lai_mu_is_gcf_page() {
+	$post = get_post();
+	return is_singular() && $post && has_shortcode( $post->post_content, 'lai_group_change_form' );
+}
+
 /* Keep this page out of search engines and caches. */
 add_filter(
 	'wp_robots',
 	function ( $robots ) {
-		$post = get_post();
-		if ( is_singular() && $post && has_shortcode( $post->post_content, 'lai_group_change_form' ) ) {
+		if ( lai_mu_is_gcf_page() ) {
 			$robots['noindex']  = true;
 			$robots['nofollow'] = true;
+		}
+		return $robots;
+	}
+);
+/* Rank Math prints its own robots tag instead of WordPress's, so tell it too. */
+add_filter(
+	'rank_math/frontend/robots',
+	function ( $robots ) {
+		if ( lai_mu_is_gcf_page() ) {
+			$robots['index']  = 'noindex';
+			$robots['follow'] = 'nofollow';
 		}
 		return $robots;
 	}

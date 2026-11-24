@@ -4,6 +4,11 @@ All notable changes to this plugin. Versions follow [semantic versioning](https:
 
 > **Note:** This history was reconstructed from the 1.4.0 code when the plugin was first put in git (2026-11-24). Version 1.4.0 is exact. The contents of 1.0.0–1.3.0 are a best reading of the code, and their dates aren't known. Please correct any entry that's wrong.
 
+## [1.4.2] – 2026-11-24
+
+### Fixed
+- The Group Change Form page now really tells search engines `noindex, nofollow`. Rank Math prints its own robots tag in place of WordPress's, so the plugin now sets it through Rank Math's `rank_math/frontend/robots` filter as well. (Before this, the page said "index, follow", although its contents were always behind the page password.)
+
 ## [1.4.1] – 2026-11-24
 
 ### Security / privacy

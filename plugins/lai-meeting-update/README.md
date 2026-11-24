@@ -1,6 +1,6 @@
 # LAI Meeting Update Form
 
-**Version 1.4.1** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
+**Version 1.4.2** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
 
 This plugin gives A.A. groups in the Lancaster Area Intergroup an easy online way to tell the office about a new meeting, or about changes to an existing meeting and its officers. It also gives the office a tool for printing a filled-in paper **Group Information Change Form** for any meeting.
 
@@ -52,7 +52,7 @@ Live on the **password-protected** page **/group-change-form/**. It fills in A.A
 - Search by name, or open `?row=N` to preselect a sheet row. Picking a meeting updates the URL to `?row=N`.
 - Options: "Fill IGR and GSR with what's on file" and "Copy current officer phone and email to the 'new' side, for the group to check". Every box can be typed over before printing.
 - The shortcode **only renders for signed-in editors** (`edit_posts`), **or on a page that has a password set and whose password the visitor has entered**. On any other page it shows a note asking for a password to be set.
-- Any page using this shortcode gets `noindex, nofollow` and no-cache headers.
+- Any page using this shortcode gets `noindex, nofollow` (in both the WordPress and the Rank Math robots tags) and no-cache headers.
 
 ---
 
