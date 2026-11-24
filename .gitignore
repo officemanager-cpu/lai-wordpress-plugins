@@ -1,0 +1,26 @@
+# Built install zips (build them from plugins/ when releasing)
+*.zip
+
+# Never commit exports of officer or meeting data
+*.csv
+*.xlsx
+*.json.bak
+exports/
+data/
+
+# Local WordPress / environment files
+.env
+.env.*
+wp-config*.php
+*.log
+node_modules/
+vendor/
+
+# Editors and OS
+.vscode/
+.idea/
+*.swp
+*~
+.DS_Store
+Thumbs.db
+desktop.ini

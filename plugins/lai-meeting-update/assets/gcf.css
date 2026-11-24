@@ -1,0 +1,58 @@
+/* LAI Group Information Change Form (office use) */
+.lai-gcf{--g-navy:#0C203B;--g-cream:#F2EADE;--g-fill:#0b4ea2;width:100%;max-width:860px;margin:0 auto 48px;color:var(--g-navy);text-align:left}
+.lai-gcf *{box-sizing:border-box;min-width:0}
+.lai-gcf-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;margin-bottom:8px}
+.lai-gcf-find{position:relative;flex:1 1 320px}
+.lai-gcf-find label{display:block;font-size:14px;margin-bottom:4px}
+.lai-gcf input[type=search]{width:100%;font:inherit;font-size:16px;padding:11px 12px;border:2px solid var(--g-navy);border-radius:0;background:#fff;color:var(--g-navy);min-height:46px}
+#lai-gcf-list{position:absolute;left:0;right:0;top:100%;z-index:20;margin:4px 0 0;padding:0;list-style:none;background:#fff;border:1px solid rgba(12,32,59,.3);max-height:min(60vh,420px);overflow:auto;box-shadow:0 8px 24px rgba(0,0,0,.15)}
+#lai-gcf-list[hidden]{display:none}
+#lai-gcf-list li{margin:0;padding:10px 12px;cursor:pointer;display:flex;flex-direction:column;border-bottom:1px solid rgba(12,32,59,.08)}
+#lai-gcf-list li span{font-size:14px;color:#3d4b5f}
+#lai-gcf-list li:hover,#lai-gcf-list li[aria-selected=true]{background:#eef3fa}
+#lai-gcf-print{font:inherit;font-size:16px;min-height:46px;padding:0 20px;border:0;border-radius:0;background:var(--g-navy);color:var(--g-cream);cursor:pointer;letter-spacing:.5px}
+#lai-gcf-print:disabled{opacity:.5;cursor:default}
+.lai-gcf-opts{display:flex;flex-wrap:wrap;gap:4px 18px;font-size:14px;color:#3d4b5f;margin-bottom:6px}
+.lai-gcf-opts label{display:flex;gap:6px;align-items:center;min-height:36px}
+.lai-gcf-status{font-size:14px;color:#3d4b5f;margin:0 0 12px}
+.lai-gcf input:focus,.lai-gcf button:focus-visible{outline:3px solid #6aa6ff;outline-offset:2px}
+/* The paper */
+.lai-gcf-paper{background:#fff;color:#111;padding:clamp(16px,4vw,44px);border:1px solid rgba(12,32,59,.15);box-shadow:0 8px 28px rgba(0,0,0,.08);font-family:"Times New Roman",Times,Georgia,serif;font-size:13px}
+.lai-gcf-paper[hidden]{display:none}
+.lai-gcf-paper h2{font-size:clamp(18px,3.2vw,24px);text-align:center;margin:0 0 6px;font-variant:small-caps;letter-spacing:.02em;color:#111}
+.lai-gcf-rule{border-top:3px solid #111;margin:0 0 16px}
+.lai-gcf-f{display:flex;align-items:flex-end;gap:6px;margin:0 0 8px}
+.lai-gcf-f b{white-space:nowrap;font-size:11.5px}
+.lai-gcf-f input{flex:1;min-width:40px;border:0;border-bottom:1px solid #222;background:transparent;color:var(--g-fill);font:14px/1.3 Arial,Helvetica,sans-serif;padding:2px 2px 1px;border-radius:0}
+.lai-gcf-f input:focus{outline:none;border-bottom:2px solid var(--g-fill)}
+.lai-gcf-two{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,230px),1fr));gap:0 32px}
+.lai-gcf-tight{gap:0 12px;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr))}
+.lai-gcf-cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,300px),1fr));gap:0 34px;margin-top:4px}
+.lai-gcf-three{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:0 14px}
+.lai-gcf-tag{display:block;width:max-content;margin:6px auto 10px;background:#111;color:#fff;font-weight:700;font-size:11.5px;padding:1px 8px}
+.lai-gcf-sub{text-align:center;font-weight:700;text-decoration:underline;margin:12px 0 8px;font-size:11.5px}
+.lai-gcf-first{margin-top:0}
+.lai-gcf-plain{text-decoration:none}
+.lai-gcf-fine{font-size:10.5px;line-height:1.45;margin:10px 0}
+.lai-gcf-ret{display:grid;grid-template-columns:minmax(0,.8fr) minmax(0,1.6fr);border:1px solid #111;margin:14px auto 0;max-width:600px;text-align:center;font-size:11.5px}
+.lai-gcf-ret>div{padding:6px}
+.lai-gcf-ret-hd{grid-column:1/-1;font-weight:700;border-bottom:1px solid #111}
+.lai-gcf-ret-l{border-right:1px solid #111}
+.lai-gcf-rev{text-align:right;font-size:9.5px;margin-top:6px}
+@media (max-width:520px){.lai-gcf-ret{grid-template-columns:minmax(0,1fr)}.lai-gcf-ret-l{border-right:0;border-bottom:1px solid #111}}
+
+/* Printing: only the paper, on one letter page, black ink */
+@media print{
+	@page{size:letter;margin:0.45in}
+	body *{visibility:hidden!important}
+	.lai-gcf-paper,.lai-gcf-paper *{visibility:visible!important}
+	.lai-gcf-paper{position:absolute;left:0;top:0;width:100%;border:0;box-shadow:none;padding:0;font-size:11.5px}
+	.lai-gcf-f input{color:#000;font-size:12px}
+	.lai-gcf-cols{grid-template-columns:1fr 1fr}
+	.lai-gcf-two{grid-template-columns:1fr 1fr}
+	.lai-gcf-tight{grid-template-columns:1fr 1fr}
+	.lai-gcf-three{grid-template-columns:1.3fr 1fr 1.2fr}
+	.lai-gcf-ret{grid-template-columns:.8fr 1.6fr}
+	.lai-gcf-ret-l{border-right:1px solid #111;border-bottom:0}
+	.jetpack-subscribe-floating-button{display:none!important}
+}
