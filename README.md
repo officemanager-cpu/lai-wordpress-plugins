@@ -6,6 +6,7 @@ Custom WordPress plugins for the Lancaster Area Intergroup (LAI) website, [lanca
 | --- | --- | --- | --- |
 | LAI Meeting Update Form | [`plugins/lai-meeting-update`](plugins/lai-meeting-update) | 1.4.4 | Public form where groups add a meeting or update their listing and officers, plus an office-only tool for printing the Group Information Change Form |
 | LAI Subscribe Button Close | [`plugins/lai-subscribe-close`](plugins/lai-subscribe-close) | 1.0.0 | Adds a close "×" to Jetpack's floating Subscribe button and remembers it for 30 days |
+| LAI Meeting Finder | [`plugins/lai-meeting-finder`](plugins/lai-meeting-finder) | 1.0.0 | `[lai_meetings]`: the meeting finder on /meeting-finder/, with filters, a free map and "Next meeting near me" (adapted from Area 53 Meeting Finder 0.5.1) |
 | LAI Meeting List (Text Version) | [`plugins/lai-meeting-list-html`](plugins/lai-meeting-list-html) | 1.0.1 | `[lai_meetings_list]` prints the whole weekly schedule as plain text below the meeting finder, for search engines and screen readers |
 | LAI FAQ Schema | [`plugins/lai-faq-schema`](plugins/lai-faq-schema) | 1.0.0 | Adds FAQ structured data to the "FAQs about LAI and AA" page, built from its H3 questions |
 
@@ -17,6 +18,7 @@ Each plugin folder has its own README and CHANGELOG.
 plugins/
   lai-meeting-update/     one WordPress plugin per folder; the folder name is the plugin slug
   lai-subscribe-close/
+  lai-meeting-finder/
   lai-meeting-list-html/
   lai-faq-schema/
 ```
@@ -29,6 +31,7 @@ WordPress expects the zip to contain the plugin folder at its top level. From th
 cd plugins
 zip -r ../lai-meeting-update.zip lai-meeting-update -x '*/README.md' '*/CHANGELOG.md'
 zip -r ../lai-subscribe-close.zip lai-subscribe-close -x '*/README.md' '*/CHANGELOG.md'
+zip -r ../lai-meeting-finder.zip lai-meeting-finder -x '*/README.md' '*/CHANGELOG.md'
 zip -r ../lai-meeting-list-html.zip lai-meeting-list-html -x '*/README.md' '*/CHANGELOG.md'
 zip -r ../lai-faq-schema.zip lai-faq-schema -x '*/README.md' '*/CHANGELOG.md'
 ```
