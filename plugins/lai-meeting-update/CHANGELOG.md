@@ -4,6 +4,13 @@ All notable changes to this plugin. Versions follow [semantic versioning](https:
 
 > **Note:** This history was reconstructed from the 1.4.0 code when the plugin was first put in git (2026-11-24). Version 1.4.0 is exact. The contents of 1.0.0–1.3.0 are a best reading of the code, and their dates aren't known. Please correct any entry that's wrong.
 
+## [1.4.3] – 2026-11-24
+
+### Added
+- A count bubble on the **Meeting Updates** dashboard menu, like the one on Comments, showing how many submissions are still marked New. It disappears once every submission is marked Done or Spam. Screen readers hear "N new meeting updates".
+- The Group Change Form now fills **group phone**, **number of members**, and **district** (when the meeting list has no district) from new U/D groups columns. With "Copy current officer… to the 'new' side" ticked, it also fills the Secretary's and Treasurer's **mailing address**.
+- The `lai_mu_officers` item accepts five more fields: `district`, `grp_phone`, `members`, `sec_addr`, `tre_addr`.
+
 ## [1.4.2] – 2026-11-24
 
 ### Fixed

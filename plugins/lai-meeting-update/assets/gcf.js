@@ -64,7 +64,7 @@
 		set('date', (now.getMonth() + 1) + '/' + now.getDate() + '/' + now.getFullYear());
 		set('grpId', r.grp_id);
 		set('area', '53');
-		set('district', String(d.district || '').replace(/^district\s*/i, ''));
+		set('district', String(d.district || r.district || '').replace(/^district\s*/i, ''));
 		set('name', r.name + (r.day ? ' (' + cap(r.day) + (t ? ' ' + t : '') + ')' : ''));
 		set('format', d.format || '');
 		set('location', d.place || '');
@@ -72,6 +72,8 @@
 		set('city', ad.city || r.city);
 		set('state', ad.state || 'OH');
 		set('zip', ad.zip);
+		set('phone', r.grp_phone);
+		set('members', r.members);
 		var same = /^same$/i.test(r.tre);
 		set('oldSec', r.sec); set('oldTre', same ? r.sec : r.tre);
 		if ($('lai-gcf-reps').checked) {
@@ -82,6 +84,9 @@
 		if ($('lai-gcf-new').checked) {
 			set('sName', r.sec); set('sPhone', r.sec_phone); set('sEmail', r.sec_email);
 			set('tName', same ? r.sec : r.tre); set('tPhone', same ? r.sec_phone : r.tre_phone); set('tEmail', same ? r.sec_email : r.tre_email);
+			var sa = parseAddress(r.sec_addr), ta = same ? sa : parseAddress(r.tre_addr);
+			set('sAddr', sa.street); set('sCity', sa.city); set('sState', sa.state || (r.sec_addr ? 'OH' : '')); set('sZip', sa.zip);
+			set('tAddr', ta.street); set('tCity', ta.city); set('tState', ta.state || ((same ? r.sec_addr : r.tre_addr) ? 'OH' : '')); set('tZip', ta.zip);
 		}
 		paper.hidden = false; printBtn.disabled = false;
 		q.value = r.name + ' — ' + r.day_time;

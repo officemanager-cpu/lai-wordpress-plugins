@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LAI Meeting Update Form
  * Description: A step-by-step form for groups to update their meeting details and officers (Secretary, Treasurer, IGR, GSR), or add a new meeting. Groups find their meeting by typing its name; the list comes from 12 Step Meeting List (read-only, never changed). Submissions are kept private under "Meeting Updates" in the dashboard and emailed to the office. Use the [lai_meeting_update] shortcode.
- * Version: 1.4.2
+ * Version: 1.4.3
  * Author: Lancaster Area Intergroup
  * License: GPL-2.0-or-later
  * Text Domain: lai-meeting-update
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LAI_MU_VERSION', '1.4.2' );
+define( 'LAI_MU_VERSION', '1.4.3' );
 define( 'LAI_MU_CPT', 'lai_mtg_update' );
 
 /** Where notices go: Meeting Updates > Settings, else the site's admin email. */
@@ -219,6 +219,50 @@ foreach ( lai_mu_private_types() as $lai_mu_type ) {
 	);
 }
 unset( $lai_mu_type );
+
+/** How many submissions are still marked New (not Done, not Spam, not in the trash). */
+function lai_mu_new_count() {
+	$q = new WP_Query(
+		array(
+			'post_type'              => LAI_MU_CPT,
+			'post_status'            => array( 'private', 'draft', 'pending', 'publish' ),
+			'meta_key'               => 'lai_mu_status', // phpcs:ignore WordPress.DB.SlowDBQuery
+			'meta_value'             => 'new', // phpcs:ignore WordPress.DB.SlowDBQuery
+			'fields'                 => 'ids',
+			'posts_per_page'         => 1,
+			'update_post_meta_cache' => false,
+			'update_post_term_cache' => false,
+		)
+	);
+	return (int) $q->found_posts;
+}
+
+/* Dashboard menu: a count bubble on "Meeting Updates", like the one on Comments. */
+add_action(
+	'admin_menu',
+	function () {
+		global $menu;
+		if ( ! current_user_can( 'edit_posts' ) || ! is_array( $menu ) ) {
+			return;
+		}
+		$n = lai_mu_new_count();
+		if ( $n < 1 ) {
+			return;
+		}
+		foreach ( $menu as $i => $item ) {
+			if ( isset( $item[2] ) && 'edit.php?post_type=' . LAI_MU_CPT === $item[2] ) {
+				$menu[ $i ][0] .= sprintf(
+					' <span class="awaiting-mod count-%1$d"><span class="pending-count" aria-hidden="true">%2$s</span><span class="screen-reader-text">%3$s</span></span>',
+					$n,
+					number_format_i18n( $n ),
+					esc_html( sprintf( 1 === $n ? '%s new meeting update' : '%s new meeting updates', number_format_i18n( $n ) ) )
+				);
+				break;
+			}
+		}
+	},
+	99
+);
 
 /* Settings: where the office notice goes. */
 add_action(
@@ -769,7 +813,7 @@ add_action(
 				'auth_callback' => function () {
 					return current_user_can( 'edit_posts' );
 				},
-				'description'   => 'JSON list of U/D groups rows: row, grp_id, day_time, name, city, igr, gsr, anniv, sec, sec_phone, sec_email, tre, tre_phone, tre_email.',
+				'description'   => 'JSON list of U/D groups rows: row, grp_id, day_time, name, city, igr, gsr, anniv, sec, sec_phone, sec_email, tre, tre_phone, tre_email, district, grp_phone, members, sec_addr, tre_addr.',
 			)
 		);
 	},
@@ -803,7 +847,7 @@ function lai_mu_officer_rows() {
 		return array();
 	}
 	$out  = array();
-	$keys = array( 'grp_id', 'day_time', 'name', 'city', 'igr', 'gsr', 'anniv', 'sec', 'sec_phone', 'sec_email', 'tre', 'tre_phone', 'tre_email' );
+	$keys = array( 'grp_id', 'day_time', 'name', 'city', 'igr', 'gsr', 'anniv', 'sec', 'sec_phone', 'sec_email', 'tre', 'tre_phone', 'tre_email', 'district', 'grp_phone', 'members', 'sec_addr', 'tre_addr' );
 	foreach ( $rows as $r ) {
 		if ( ! is_array( $r ) || empty( $r['name'] ) ) {
 			continue;
@@ -880,7 +924,7 @@ function lai_mu_gcf_shortcode() {
 	</div>
 	<div class="lai-gcf-opts">
 		<label><input type="checkbox" id="lai-gcf-reps" checked> Fill IGR and GSR with what's on file</label>
-		<label><input type="checkbox" id="lai-gcf-new"> Copy current officer phone and email to the "new" side, for the group to check</label>
+		<label><input type="checkbox" id="lai-gcf-new"> Copy current officer phone, email and mailing address to the "new" side, for the group to check</label>
 	</div>
 	<p id="lai-gcf-status" class="lai-gcf-status" role="status"></p>
 	<form class="lai-gcf-paper" id="lai-gcf-paper" hidden autocomplete="off" onsubmit="return false">
