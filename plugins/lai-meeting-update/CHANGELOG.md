@@ -4,6 +4,13 @@ All notable changes to this plugin. Versions follow [semantic versioning](https:
 
 > **Note:** This history was reconstructed from the 1.4.0 code when the plugin was first put in git (2026-11-24). Version 1.4.0 is exact. The contents of 1.0.0–1.3.0 are a best reading of the code, and their dates aren't known. Please correct any entry that's wrong.
 
+## [1.4.7] – 2026-11-25
+
+Restores the Google Sheets links, first released on 2026-11-24 as a separate 1.4.5 that was installed on the site but never merged into the main code. Versions 1.4.4 (2026-11-25) to 1.4.6 were built without it, so the buttons disappeared. The saved links stayed in Settings and show again.
+
+### Added
+- Links to the office's Google Sheets. **Meeting Updates → Settings** has two new fields, **Meetings sheet** and **Officers sheet** (options `lai_mu_sheet_meetings` and `lai_mu_sheet_officers`; only `https://docs.google.com/spreadsheets/` links are kept). Once set, they show as buttons above the Meeting Updates list and in each submission's Status box, and open in a new tab. The links live in Settings, not in the code, because this code is public.
+
 ## [1.4.6] – 2026-11-25
 
 ### Added

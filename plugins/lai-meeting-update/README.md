@@ -1,6 +1,6 @@
 # LAI Meeting Update Form
 
-**Version 1.4.6** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
+**Version 1.4.7** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
 
 This plugin gives A.A. groups in the Lancaster Area Intergroup an easy online way to tell the office about a new meeting, or about changes to an existing meeting and its officers. It also gives the office a tool for printing a filled-in paper **Group Information Change Form** for any meeting.
 
@@ -64,7 +64,7 @@ Live on the **password-protected** page **/group-change-form/**. It fills in A.A
 1. Make sure **12 Step Meeting List** is installed and active.
 2. Zip the `lai-meeting-update` folder, keeping the folder at the top of the zip, and upload it under **Plugins › Add New › Upload Plugin**. Or install it with the WordPress.com connector, as described in the [top-level README](../../README.md#deploying-to-the-live-site).
 3. Activate it.
-4. Go to **Meeting Updates › Settings** and enter the office email that should receive notices.
+4. Go to **Meeting Updates › Settings** and enter the office email that should receive notices. Optionally paste the links to the office's **Meetings sheet** and **Officers sheet**, which then show as buttons on the Meeting Updates list and on each submission.
 5. Make a page with the `[lai_meeting_update]` shortcode. On the live site this is /update-your-meeting/.
 6. For the office tool, make a page with `[lai_group_change_form]` and **set it to Password protected** (Page settings › Visibility).
 7. Optional: (re)load the private `lai_mu_roster` and `lai_mu_officers` items. On the live site the scheduled task does this every hour, 8 AM–10 PM. Both items **must be saved with status Private** (see Privacy below).

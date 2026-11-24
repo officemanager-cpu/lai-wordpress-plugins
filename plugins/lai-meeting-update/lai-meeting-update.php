@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LAI Meeting Update Form
  * Description: A step-by-step form for groups to update their meeting details and officers (Secretary, Treasurer, IGR, GSR), or add a new meeting. Groups find their meeting by typing its name; the list comes from 12 Step Meeting List (read-only, never changed). Submissions are kept private under "Meeting Updates" in the dashboard and emailed to the office. Use the [lai_meeting_update] shortcode.
- * Version: 1.4.6
+ * Version: 1.4.7
  * Author: Lancaster Area Intergroup
  * License: GPL-2.0-or-later
  * Text Domain: lai-meeting-update
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LAI_MU_VERSION', '1.4.6' );
+define( 'LAI_MU_VERSION', '1.4.7' );
 define( 'LAI_MU_HOURLY_LIMIT', 60 ); // Submissions allowed per clock hour from one connection.
 define( 'LAI_MU_CPT', 'lai_mtg_update' );
 
@@ -284,14 +284,78 @@ add_action(
 				'default'           => '',
 			)
 		);
+		foreach ( array_keys( lai_mu_sheet_fields() ) as $opt ) {
+			register_setting(
+				'lai_mu',
+				$opt,
+				array(
+					'type'              => 'string',
+					'sanitize_callback' => 'lai_mu_clean_sheet_url',
+					'default'           => '',
+				)
+			);
+		}
 	}
 );
+
+/*
+ * Links to the office's Google Sheets that submissions are copied into. Kept in Settings, never in
+ * this code, because the code is public and a sheet link can be enough to open the sheet.
+ */
+function lai_mu_sheet_fields() {
+	return array(
+		'lai_mu_sheet_meetings' => array( 'Meetings sheet', 'The meeting directory (Meetings tab) that meeting changes are copied into.' ),
+		'lai_mu_sheet_officers' => array( 'Officers sheet', 'The officers contact sheet (U/D groups tab) that officer changes are copied into.' ),
+	);
+}
+
+/** Only Google Sheets links are kept. */
+function lai_mu_clean_sheet_url( $url ) {
+	$url = esc_url_raw( trim( (string) $url ), array( 'https' ) );
+	return 0 === strpos( $url, 'https://docs.google.com/spreadsheets/' ) ? $url : '';
+}
+
+/** Buttons that open the linked sheets in a new tab ('' if none are set). */
+function lai_mu_sheet_links_html() {
+	$out = '';
+	foreach ( lai_mu_sheet_fields() as $opt => $f ) {
+		$url = get_option( $opt, '' );
+		if ( $url ) {
+			$out .= '<a class="button" href="' . esc_url( $url ) . '" target="_blank" rel="noopener noreferrer">' . esc_html( $f[0] ) . ' <span aria-hidden="true">↗</span><span class="screen-reader-text"> (opens in a new tab)</span></a> ';
+		}
+	}
+	return $out;
+}
+
+/* On the Meeting Updates list: a bar with the sheet buttons. */
+add_action(
+	'admin_notices',
+	function () {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'edit-' . LAI_MU_CPT !== $screen->id || ! current_user_can( 'edit_posts' ) ) {
+			return;
+		}
+		$links = lai_mu_sheet_links_html();
+		if ( $links ) {
+			echo '<div class="notice notice-info inline" style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:8px 12px"><strong>Linked sheets:</strong> ' . $links . '</div>'; // phpcs:ignore WordPress.Security.EscapeOutput -- built from escaped parts.
+		} elseif ( current_user_can( 'manage_options' ) ) {
+			echo '<div class="notice notice-info inline"><p>Add links to the office\'s meeting and officers sheets in <a href="' . esc_url( admin_url( 'edit.php?post_type=' . LAI_MU_CPT . '&page=lai-mu-settings' ) ) . '">Settings</a> to show buttons for them here.</p></div>';
+		}
+	}
+);
+
 function lai_mu_settings_page() {
 	echo '<div class="wrap"><h1>Meeting Update Settings</h1><form method="post" action="options.php">';
 	settings_fields( 'lai_mu' );
 	echo '<table class="form-table"><tr><th scope="row"><label for="lai_mu_office_email">Send notices to</label></th><td>';
 	echo '<input type="email" class="regular-text" id="lai_mu_office_email" name="lai_mu_office_email" value="' . esc_attr( get_option( 'lai_mu_office_email', '' ) ) . '" placeholder="' . esc_attr( get_option( 'admin_email' ) ) . '">';
-	echo '<p class="description">Each new submission is emailed here. Leave blank to use the site\'s admin email.</p></td></tr></table>';
+	echo '<p class="description">Each new submission is emailed here. Leave blank to use the site\'s admin email.</p></td></tr>';
+	foreach ( lai_mu_sheet_fields() as $opt => $f ) {
+		echo '<tr><th scope="row"><label for="' . esc_attr( $opt ) . '">' . esc_html( $f[0] ) . '</label></th><td>';
+		echo '<input type="url" class="large-text code" id="' . esc_attr( $opt ) . '" name="' . esc_attr( $opt ) . '" value="' . esc_attr( get_option( $opt, '' ) ) . '" placeholder="https://docs.google.com/spreadsheets/d/…">';
+		echo '<p class="description">' . esc_html( $f[1] ) . ' Paste the sheet\'s address from your browser. It shows as a button on the Meeting Updates list and on each submission.</p></td></tr>';
+	}
+	echo '</table>';
 	submit_button();
 	echo '</form></div>';
 }
@@ -956,6 +1020,10 @@ function lai_mu_status_box( $post ) {
 	echo '<input type="submit" name="save" id="save-post" class="button button-primary button-large" value="Save">';
 	echo '</div>';
 	echo '<p class="description" style="margin-top:10px">This record stays private: it is only seen here in the dashboard, never on the website.</p>';
+	$links = lai_mu_sheet_links_html();
+	if ( $links ) {
+		echo '<hr><p style="margin:8px 0 4px"><strong>Linked sheets</strong></p><p style="display:flex;flex-wrap:wrap;gap:6px;margin:0">' . $links . '</p>'; // phpcs:ignore WordPress.Security.EscapeOutput -- built from escaped parts.
+	}
 }
 
 add_action(

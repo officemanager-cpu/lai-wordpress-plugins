@@ -4,7 +4,7 @@ Custom WordPress plugins for the Lancaster Area Intergroup (LAI) website, [lanca
 
 | Plugin | Folder | Version | What it does |
 | --- | --- | --- | --- |
-| LAI Meeting Update Form | [`plugins/lai-meeting-update`](plugins/lai-meeting-update) | 1.4.6 | Public form where groups add a meeting or update their listing and officers, plus an office-only tool for printing the Group Information Change Form |
+| LAI Meeting Update Form | [`plugins/lai-meeting-update`](plugins/lai-meeting-update) | 1.4.7 | Public form where groups add a meeting or update their listing and officers, plus an office-only tool for printing the Group Information Change Form |
 | LAI Subscribe Button Close | [`plugins/lai-subscribe-close`](plugins/lai-subscribe-close) | 1.0.0 | Adds a close "×" to Jetpack's floating Subscribe button and remembers it for 30 days |
 | LAI Meeting Finder | [`plugins/lai-meeting-finder`](plugins/lai-meeting-finder) | 1.0.0 | `[lai_meetings]`: the meeting finder on /meeting-finder/, with filters, a free map and "Next meeting near me" (adapted from Area 53 Meeting Finder 0.5.1) |
 | LAI Meeting List (Text Version) | [`plugins/lai-meeting-list-html`](plugins/lai-meeting-list-html) | 1.0.1 | `[lai_meetings_list]` prints the whole weekly schedule as plain text below the meeting finder, for search engines and screen readers |
