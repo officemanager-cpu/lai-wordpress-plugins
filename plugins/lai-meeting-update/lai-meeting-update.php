@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LAI Meeting Update Form
  * Description: A step-by-step form for groups to update their meeting details and officers (Secretary, Treasurer, IGR, GSR), or add a new meeting. Groups find their meeting by typing its name; the list comes from 12 Step Meeting List (read-only, never changed). Submissions are kept private under "Meeting Updates" in the dashboard and emailed to the office. Use the [lai_meeting_update] shortcode.
- * Version: 1.4.7
+ * Version: 1.4.8
  * Author: Lancaster Area Intergroup
  * License: GPL-2.0-or-later
  * Text Domain: lai-meeting-update
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LAI_MU_VERSION', '1.4.7' );
+define( 'LAI_MU_VERSION', '1.4.8' );
 define( 'LAI_MU_HOURLY_LIMIT', 60 ); // Submissions allowed per clock hour from one connection.
 define( 'LAI_MU_CPT', 'lai_mtg_update' );
 

@@ -310,7 +310,7 @@
 			h('p', { class: 'lai-mu-lead', text: 'So the office can reach you if we have a question. First name and last initial is fine.' }),
 			h('div', { class: 'lai-mu-grid' },
 				field('Your name', 'sender.name', { required: true, ph: 'e.g. Pat S.' }),
-				field('Your role in the group', 'sender.role', { options: ['Secretary', 'Treasurer', 'Intergroup Rep (IGR)', 'General Service Rep (GSR)', 'Other group member'].map(function (x) { return { value: x, label: x }; }) }),
+				field('Your role', 'sender.role', { options: ['Secretary', 'Treasurer', 'Intergroup Rep (IGR)', 'General Service Rep (GSR)', 'Other group member', 'LAI Office Manager', 'LAI Assistant Manager', 'LAI Membership Committee'].map(function (x) { return { value: x, label: x }; }) }),
 				field('Phone or email', 'sender.contact', { wide: true, required: true })),
 			h('div', { class: 'lai-mu-hp', 'aria-hidden': 'true' },
 				h('label', { for: 'lai-mu-website', text: 'Leave this empty' }),

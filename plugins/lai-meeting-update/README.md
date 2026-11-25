@@ -1,6 +1,6 @@
 # LAI Meeting Update Form
 
-**Version 1.4.7** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
+**Version 1.4.8** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
 
 This plugin gives A.A. groups in the Lancaster Area Intergroup an easy online way to tell the office about a new meeting, or about changes to an existing meeting and its officers. It also gives the office a tool for printing a filled-in paper **Group Information Change Form** for any meeting.
 
@@ -17,7 +17,7 @@ Live on **/update-your-meeting/**. It is a four-step form that runs in the brows
 1. **Find your meeting.** Type-ahead search over the live TSML list. If more than one meeting has the same name, the results show each one's day, time, and place, and the form says so. There is also a **"My meeting isn't listed – add a new meeting"** button.
 2. **Check the details** (or, for a new meeting, **Meeting details**). For an update, every field is prefilled with what the meeting list shows now: day, start and end time, building, street, city, ZIP, district, and type/format. Any field that's edited gets a **"Changed"** tag. Type/format is a set of checkboxes plus an **"Other"** option with its own text box. Formats on file that don't match a checkbox are put into "Other". There are also fields that aren't published: **group anniversary** (the start date), Group ID #, group phone, and number of members.
 3. **Officers.** Secretary, Treasurer, Intergroup Rep (IGR), and General Service Rep (GSR). For an update, each role shows who is on file, as **first name + last initial only** (for example "On file: Pat S."), and offers "No change" or "New person or new contact info".
-4. **Notes and send.** Notes for the office, plus the sender's name, role, and a phone or email.
+4. **Notes and send.** Notes for the office, plus the sender's name, role (a group role, or LAI Office Manager / Assistant Manager / Membership Committee), and a phone or email.
 
 **Only the fields that changed are sent.** Unchanged meeting fields go to the server as blank, which means "no change".
 
