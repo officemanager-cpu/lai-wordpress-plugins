@@ -4,6 +4,12 @@ All notable changes to this plugin. Versions follow [semantic versioning](https:
 
 > **Note:** This history was reconstructed from the 1.4.0 code when the plugin was first put in git (2026-11-24). Version 1.4.0 is exact. The contents of 1.0.0–1.3.0 are a best reading of the code, and their dates aren't known. Please correct any entry that's wrong.
 
+## [1.4.6] – 2026-11-25
+
+### Added
+- **Bulk actions** on the Meeting Updates list: tick submissions, choose **Mark as Done**, **Mark as New**, or **Mark as Spam** under Bulk actions, and press Apply. A notice confirms how many were changed. WordPress's Bulk Edit is removed from that menu, because it offers "Published", which can never apply. Move to Trash stays.
+- **New / Done / Spam filter links**, with counts, above the list. For example, click **New**, tick the box at the top to select them all, and mark them Done in one step. The unhelpful "Private" link (every submission is private) is removed.
+
 ## [1.4.5] – 2026-11-25
 
 Combines the two changes both numbered 1.4.4 (the Save button, made in another session, and this release's fixes). A 1.4.4 without the Save button was briefly installed on 2026-11-25; 1.4.5 restores the Save button.

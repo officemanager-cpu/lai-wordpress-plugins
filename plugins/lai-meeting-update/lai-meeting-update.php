@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LAI Meeting Update Form
  * Description: A step-by-step form for groups to update their meeting details and officers (Secretary, Treasurer, IGR, GSR), or add a new meeting. Groups find their meeting by typing its name; the list comes from 12 Step Meeting List (read-only, never changed). Submissions are kept private under "Meeting Updates" in the dashboard and emailed to the office. Use the [lai_meeting_update] shortcode.
- * Version: 1.4.5
+ * Version: 1.4.6
  * Author: Lancaster Area Intergroup
  * License: GPL-2.0-or-later
  * Text Domain: lai-meeting-update
@@ -12,7 +12,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LAI_MU_VERSION', '1.4.5' );
+define( 'LAI_MU_VERSION', '1.4.6' );
 define( 'LAI_MU_HOURLY_LIMIT', 60 ); // Submissions allowed per clock hour from one connection.
 define( 'LAI_MU_CPT', 'lai_mtg_update' );
 
@@ -733,6 +733,144 @@ add_filter(
 	},
 	10,
 	2
+);
+
+/* ------------------------------------------------------------------
+ * Dashboard list: bulk "Mark as Done / New / Spam" and New / Done / Spam filter links
+ * ------------------------------------------------------------------ */
+
+/** The statuses a submission can have, with their labels. */
+function lai_mu_statuses() {
+	return array(
+		'new'  => 'New',
+		'done' => 'Done',
+		'spam' => 'Spam',
+	);
+}
+
+add_filter(
+	'bulk_actions-edit-' . LAI_MU_CPT,
+	function ( $actions ) {
+		// WordPress's Bulk Edit offers "Published", which can never apply here (same reason as Quick Edit).
+		unset( $actions['edit'] );
+		$ours = array();
+		foreach ( lai_mu_statuses() as $s => $label ) {
+			$ours[ 'lai_mu_mark_' . $s ] = 'Mark as ' . $label;
+		}
+		return $ours + $actions; // Ours first, then Move to Trash.
+	}
+);
+
+add_filter(
+	'handle_bulk_actions-edit-' . LAI_MU_CPT,
+	function ( $redirect, $action, $post_ids ) {
+		// WordPress has already checked the list's bulk-action nonce before this runs.
+		if ( 0 !== strpos( $action, 'lai_mu_mark_' ) ) {
+			return $redirect;
+		}
+		$to = substr( $action, strlen( 'lai_mu_mark_' ) );
+		if ( ! isset( lai_mu_statuses()[ $to ] ) ) {
+			return $redirect;
+		}
+		$n = 0;
+		foreach ( (array) $post_ids as $id ) {
+			$id = (int) $id;
+			if ( LAI_MU_CPT === get_post_type( $id ) && current_user_can( 'edit_post', $id ) ) {
+				update_post_meta( $id, 'lai_mu_status', $to );
+				++$n;
+			}
+		}
+		return add_query_arg(
+			array(
+				'lai_mu_marked' => $n,
+				'lai_mu_to'     => $to,
+			),
+			$redirect
+		);
+	},
+	10,
+	3
+);
+
+/* "5 meeting updates marked Done." after a bulk action. */
+add_action(
+	'admin_notices',
+	function () {
+		$screen = function_exists( 'get_current_screen' ) ? get_current_screen() : null;
+		if ( ! $screen || 'edit-' . LAI_MU_CPT !== $screen->id || ! isset( $_GET['lai_mu_marked'], $_GET['lai_mu_to'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		$n  = absint( $_GET['lai_mu_marked'] ); // phpcs:ignore WordPress.Security.NonceVerification
+		$to = sanitize_key( wp_unslash( $_GET['lai_mu_to'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		if ( ! isset( lai_mu_statuses()[ $to ] ) ) {
+			return;
+		}
+		printf(
+			'<div class="notice notice-success is-dismissible"><p>%s</p></div>',
+			esc_html( sprintf( 1 === $n ? '%d meeting update marked %s.' : '%d meeting updates marked %s.', $n, lai_mu_statuses()[ $to ] ) )
+		);
+	}
+);
+add_filter(
+	'removable_query_args',
+	function ( $args ) {
+		$args[] = 'lai_mu_marked';
+		$args[] = 'lai_mu_to';
+		return $args;
+	}
+);
+
+/* Filter links above the list: All | New (12) | Done (40) | Spam (1). */
+add_filter(
+	'views_edit-' . LAI_MU_CPT,
+	function ( $views ) {
+		$current = isset( $_GET['lai_mu_status'] ) ? sanitize_key( wp_unslash( $_GET['lai_mu_status'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification
+		$base    = admin_url( 'edit.php?post_type=' . LAI_MU_CPT );
+		// WordPress's own links (All, Private, Trash). "Private" is every submission, so it adds nothing.
+		unset( $views['private'] );
+		if ( '' !== $current && isset( $views['all'] ) ) {
+			$views['all'] = str_replace( array( ' class="current"', ' aria-current="page"' ), '', $views['all'] );
+		}
+		$ours = array();
+		foreach ( lai_mu_statuses() as $s => $label ) {
+			$count = 'new' === $s ? lai_mu_new_count() : (int) ( new WP_Query(
+				array(
+					'post_type'              => LAI_MU_CPT,
+					'post_status'            => array( 'private', 'draft', 'pending', 'publish' ),
+					'meta_key'               => 'lai_mu_status', // phpcs:ignore WordPress.DB.SlowDBQuery
+					'meta_value'             => $s, // phpcs:ignore WordPress.DB.SlowDBQuery
+					'fields'                 => 'ids',
+					'posts_per_page'         => 1,
+					'update_post_meta_cache' => false,
+					'update_post_term_cache' => false,
+				)
+			) )->found_posts;
+			$ours[ 'lai_mu_' . $s ] = sprintf(
+				'<a href="%s"%s>%s <span class="count">(%s)</span></a>',
+				esc_url( add_query_arg( 'lai_mu_status', $s, $base ) ),
+				$current === $s ? ' class="current" aria-current="page"' : '',
+				esc_html( $label ),
+				esc_html( number_format_i18n( $count ) )
+			);
+		}
+		// All, then New / Done / Spam, then Trash.
+		$all = isset( $views['all'] ) ? array( 'all' => $views['all'] ) : array();
+		unset( $views['all'] );
+		return $all + $ours + $views;
+	}
+);
+add_action(
+	'pre_get_posts',
+	function ( $q ) {
+		if ( ! is_admin() || ! $q->is_main_query() || LAI_MU_CPT !== $q->get( 'post_type' ) || empty( $_GET['lai_mu_status'] ) ) { // phpcs:ignore WordPress.Security.NonceVerification
+			return;
+		}
+		$s = sanitize_key( wp_unslash( $_GET['lai_mu_status'] ) ); // phpcs:ignore WordPress.Security.NonceVerification
+		if ( isset( lai_mu_statuses()[ $s ] ) ) {
+			$q->set( 'meta_key', 'lai_mu_status' );
+			$q->set( 'meta_value', $s );
+		}
+	}
 );
 
 function lai_mu_row( $label, $value ) {
