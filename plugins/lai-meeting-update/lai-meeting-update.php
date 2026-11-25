@@ -2,7 +2,7 @@
 /**
  * Plugin Name: LAI Meeting Update Form
  * Description: A step-by-step form for groups to update their meeting details and officers (Secretary, Treasurer, IGR, GSR), or add a new meeting. Groups find their meeting by typing its name; the list comes from 12 Step Meeting List (read-only, never changed). Submissions are kept private under "Meeting Updates" in the dashboard and emailed to the office. Use the [lai_meeting_update] shortcode.
- * Version: 1.4.4
+ * Version: 1.4.5
  * Author: Lancaster Area Intergroup
  * License: GPL-2.0-or-later
  * Text Domain: lai-meeting-update
@@ -12,7 +12,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'LAI_MU_VERSION', '1.4.4' );
+define( 'LAI_MU_VERSION', '1.4.5' );
+define( 'LAI_MU_HOURLY_LIMIT', 60 ); // Submissions allowed per clock hour from one connection.
 define( 'LAI_MU_CPT', 'lai_mtg_update' );
 
 /** Where notices go: Meeting Updates > Settings, else the site's admin email. */
@@ -386,6 +387,8 @@ function lai_mu_shortcode() {
 		'meetings' => lai_mu_add_roster( lai_mu_meetings() ),
 		'rest'     => esc_url_raw( rest_url( 'lai-mu/v1/' ) ),
 		'phone'    => '740-653-4869',
+		// Only for signed-in users (their pages are never edge-cached), so office staff can test without the hourly limit.
+		'nonce'    => is_user_logged_in() ? wp_create_nonce( 'wp_rest' ) : '',
 	);
 	return '<div class="lai-mu" id="lai-mu"><noscript><p>This form needs JavaScript. You can also call the office at 740-653-4869.</p></noscript></div>'
 		. '<script type="application/json" id="lai-mu-config">' . wp_json_encode( $config, JSON_HEX_TAG | JSON_HEX_AMP | JSON_HEX_APOS | JSON_HEX_QUOT ) . '</script>';
@@ -460,8 +463,20 @@ function lai_mu_clean( $data, $spec ) {
 
 function lai_mu_submit( WP_REST_Request $req ) {
 	$in   = (array) $req->get_json_params();
+	/*
+	 * Problems are answered with HTTP 200 and {ok:false, message}. WordPress.com swaps some error
+	 * statuses (such as 429) for its own HTML page, which the form can't read, so it would show
+	 * "We couldn't reach the website" instead of the real reason.
+	 */
 	$fail = function ( $msg, $code = 400 ) {
-		return new WP_Error( 'lai_mu', $msg, array( 'status' => $code ) );
+		return new WP_REST_Response(
+			array(
+				'ok'      => false,
+				'message' => $msg,
+				'code'    => $code,
+			),
+			200
+		);
 	};
 
 	// Spam trap: a hidden box people never see or fill.
@@ -474,13 +489,19 @@ function lai_mu_submit( WP_REST_Request $req ) {
 	if ( ! $t || ! hash_equals( lai_mu_sign( $t ), $s ) || time() - $t < 4 || time() - $t > 2 * DAY_IN_SECONDS ) {
 		return $fail( 'Please reload the page and try again.' );
 	}
-	// No more than 6 sends an hour from one connection.
-	$key   = 'lai_mu_rate_' . md5( lai_mu_client_ip() );
-	$count = (int) get_transient( $key );
-	if ( $count >= 6 ) {
-		return $fail( 'Too many updates sent from here in the last hour. Please call the office at 740-653-4869.', 429 );
+	/*
+	 * No more than LAI_MU_HOURLY_LIMIT sends per clock hour from one connection (several people
+	 * may update meetings from one office network). Each clock hour starts a fresh count.
+	 * Signed-in office staff (editors) aren't limited.
+	 */
+	if ( ! current_user_can( 'edit_posts' ) ) {
+		$key   = 'lai_mu_rate_' . md5( lai_mu_client_ip() ) . '_' . gmdate( 'YmdH' );
+		$count = (int) get_transient( $key );
+		if ( $count >= LAI_MU_HOURLY_LIMIT ) {
+			return $fail( 'Too many updates have been sent from this connection in the last hour. Please wait an hour and try again, or call the office at 740-653-4869.', 429 );
+		}
+		set_transient( $key, $count + 1, HOUR_IN_SECONDS );
 	}
-	set_transient( $key, $count + 1, HOUR_IN_SECONDS );
 
 	$person = array(
 		'change' => 'bool',

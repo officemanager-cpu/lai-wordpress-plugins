@@ -4,6 +4,18 @@ All notable changes to this plugin. Versions follow [semantic versioning](https:
 
 > **Note:** This history was reconstructed from the 1.4.0 code when the plugin was first put in git (2026-11-24). Version 1.4.0 is exact. The contents of 1.0.0–1.3.0 are a best reading of the code, and their dates aren't known. Please correct any entry that's wrong.
 
+## [1.4.5] – 2026-11-25
+
+Combines the two changes both numbered 1.4.4 (the Save button, made in another session, and this release's fixes). A 1.4.4 without the Save button was briefly installed on 2026-11-25; 1.4.5 restores the Save button.
+
+### Fixed
+- A sender who went over the hourly limit saw "We couldn't reach the website", which wasn't the real problem. WordPress.com replaces a 429 ("too many requests") reply with its own HTML page, which the form couldn't read. The submit endpoint now answers every problem with HTTP 200 and `{ok:false, message}`, so the real reason is shown.
+- If the website ever answers with something other than the form's usual reply (an error page), the form now says "Something went wrong on the website (error N)…" or, for 429, "Too many updates… please wait an hour". "We couldn't reach the website" now appears only when there really is no connection.
+
+### Changed
+- The hourly limit is raised from 6 to **60 submissions per clock hour from one connection** (constant `LAI_MU_HOURLY_LIMIT`), because several people may update meetings from one office network. The count now starts fresh each clock hour. Before, every submission pushed the hour back, so a busy afternoon could stay blocked.
+- Signed-in office staff (editors) are no longer held to the hourly limit, so the office can test the form. The form sends a REST nonce only on pages viewed while signed in, which are never edge-cached. If that page has been open more than a day, the form asks for a reload.
+
 ## [1.4.4] – 2026-11-24
 
 ### Changed

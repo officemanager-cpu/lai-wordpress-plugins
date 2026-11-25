@@ -352,12 +352,23 @@
 	}
 	function send() {
 		S.sending = true; S.error = ''; render();
-		fetch(cfg.rest + 'submit', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload()), credentials: 'same-origin' })
-			.then(function (r) { return r.json().then(function (j) { return { ok: r.ok, j: j }; }); })
+		var headers = { 'Content-Type': 'application/json' };
+		if (cfg.nonce) { headers['X-WP-Nonce'] = cfg.nonce; }
+		fetch(cfg.rest + 'submit', { method: 'POST', headers: headers, body: JSON.stringify(payload()), credentials: 'same-origin' })
+			.then(function (r) {
+				// The website answered. If it wasn't the form's usual reply (e.g. an error page), say so plainly.
+				return r.json().then(function (j) { return { ok: r.ok, status: r.status, j: j }; },
+					function () { return { ok: false, status: r.status, j: null }; });
+			})
 			.then(function (res) {
 				S.sending = false;
-				if (res.ok && res.j && res.j.ok) { S.step = 5; render(true); }
-				else { S.error = (res.j && res.j.message) || 'Something went wrong. Please try again, or call the office.'; render(); }
+				if (res.ok && res.j && res.j.ok) { S.step = 5; render(true); return; }
+				var phone = cfg.phone || 'the office';
+				if (res.j && res.j.code === 'rest_cookie_invalid_nonce') { S.error = 'This page has been open a long time. Please reload the page and try again.'; }
+				else if (res.j && res.j.message) { S.error = res.j.message; }
+				else if (res.status === 429) { S.error = 'Too many updates have been sent from this connection in the last hour. Please wait an hour and try again, or call ' + phone + '.'; }
+				else { S.error = 'Something went wrong on the website (error ' + res.status + '). Please try again in a few minutes, or call ' + phone + '.'; }
+				render();
 			})
 			.catch(function () { S.sending = false; S.error = 'We couldn’t reach the website. Check your connection and try again.'; render(); });
 	}

@@ -1,6 +1,6 @@
 # LAI Meeting Update Form
 
-**Version 1.4.4** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
+**Version 1.4.5** · Requires WordPress with the [12 Step Meeting List](https://wordpress.org/plugins/12-step-meeting-list/) (TSML) plugin · GPL-2.0-or-later
 
 This plugin gives A.A. groups in the Lancaster Area Intergroup an easy online way to tell the office about a new meeting, or about changes to an existing meeting and its officers. It also gives the office a tool for printing a filled-in paper **Group Information Change Form** for any meeting.
 
@@ -36,7 +36,7 @@ Each submission:
 
 - **Honeypot:** a hidden `website` field. If it's filled, the server says "ok" and quietly discards the submission.
 - **Signed timestamp:** the form fetches `GET /wp-json/lai-mu/v1/token`, which returns a time and an HMAC-SHA256 signature (keyed with `wp_salt('nonce')`). The submission must carry a valid signature, and the form must have been open **at least 4 seconds and no more than 2 days**.
-- **Rate limit:** at most **6 submissions per hour per IP address**. This uses a transient keyed by a hash of the IP.
+- **Rate limit:** at most **60 submissions per clock hour per IP address** (`LAI_MU_HOURLY_LIMIT`). This uses a transient keyed by a hash of the IP plus the hour. Signed-in editors aren't limited. Problems are answered with HTTP 200 and `{ok:false, message}`, because WordPress.com replaces 429 replies with its own HTML page.
 - **Akismet:** if Akismet is active and has a key, each submission is checked as a `contact-form`. Spam is saved with status `spam` and no email is sent.
 - **Server-side cleaning:** only expected keys are kept. Every value is sanitized and length-limited.
 
